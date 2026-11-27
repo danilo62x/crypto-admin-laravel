@@ -1,0 +1,190 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@config 'tailwind.config.js';
+
+/* ===== Tailwind admin (tailwind/vue3) — Filament theme ===== */
+
+:root {
+  --tx-sidebar-bg: 255 255 255;
+  --tx-sidebar-text: 71 84 103;
+  --tx-sidebar-text-active: 70 95 255;
+  --tx-sidebar-active-bg: 236 243 255;
+  --tx-sidebar-border: 228 231 236;
+
+  --tx-body-bg: 249 250 251;
+  --tx-card-bg: 255 255 255;
+  --tx-header-bg: 255 255 255;
+  --tx-border: 228 231 236;
+
+  --tx-text: 52 64 84;
+  --tx-text-heading: 16 24 40;
+  --tx-text-muted: 102 112 133;
+}
+
+.dark {
+  --tx-sidebar-bg: 26 34 49;
+  --tx-sidebar-text: 152 162 179;
+  --tx-sidebar-text-active: 255 255 255;
+  --tx-sidebar-active-bg: 70 95 255 / 0.15;
+  --tx-sidebar-border: 31 41 55;
+
+  --tx-body-bg: 16 24 40;
+  --tx-card-bg: 26 34 49;
+  --tx-header-bg: 26 34 49;
+  --tx-border: 31 41 55;
+
+  --tx-text: 208 213 221;
+  --tx-text-heading: 249 250 251;
+  --tx-text-muted: 152 162 179;
+}
+
+html, body, .fi-body {
+  font-family: 'Outfit', ui-sans-serif, system-ui, sans-serif !important;
+  letter-spacing: -0.01em;
+}
+
+/* ===== Body background ===== */
+.fi-body {
+  background-color: rgb(var(--tx-body-bg));
+  color: rgb(var(--tx-text));
+}
+
+/* ===== Sidebar ===== */
+.fi-sidebar {
+  background-color: rgb(var(--tx-sidebar-bg)) !important;
+  border-right: 1px solid rgb(var(--tx-sidebar-border));
+}
+.fi-sidebar-nav-item-button {
+  border-radius: 0.625rem !important;
+  font-weight: 500;
+  color: rgb(var(--tx-sidebar-text)) !important;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.fi-sidebar-nav-item-button:hover {
+  background-color: rgb(var(--tx-sidebar-active-bg)) !important;
+  color: rgb(var(--tx-sidebar-text-active)) !important;
+}
+.fi-sidebar-nav-item-active .fi-sidebar-nav-item-button,
+.fi-sidebar-nav-item-button[aria-current='page'] {
+  background-color: rgb(var(--tx-sidebar-active-bg)) !important;
+  color: rgb(var(--tx-sidebar-text-active)) !important;
+  font-weight: 600;
+}
+.fi-sidebar-group-label {
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  opacity: 0.6;
+}
+
+/* ===== Topbar ===== */
+.fi-topbar > nav {
+  background-color: rgb(var(--tx-header-bg)) !important;
+  border-bottom: 1px solid rgb(var(--tx-border));
+  backdrop-filter: blur(12px);
+}
+
+/* ===== Page header ===== */
+.fi-header-heading {
+  font-size: 1.75rem !important;
+  font-weight: 600;
+  color: rgb(var(--tx-text-heading));
+  letter-spacing: -0.02em;
+}
+.fi-header-subheading {
+  color: rgb(var(--tx-text-muted));
+}
+
+/* ===== Cards / sections ===== */
+.fi-section,
+.fi-ta,
+.fi-wi-stats-overview-stat,
+.fi-fo-component-ctn {
+  border-radius: 0.875rem !important;
+  border-color: rgb(var(--tx-border)) !important;
+  background-color: rgb(var(--tx-card-bg)) !important;
+}
+
+/* ===== Buttons ===== */
+.fi-btn {
+  border-radius: 0.625rem !important;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  transition: transform 0.05s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+.fi-btn:active {
+  transform: translateY(1px);
+}
+.fi-btn-color-primary {
+  box-shadow: 0 4px 14px -4px rgba(70, 95, 255, 0.45);
+}
+
+/* ===== Form inputs ===== */
+.fi-input,
+.fi-select-input,
+.fi-fo-textarea,
+.fi-input-wrp {
+  border-radius: 0.625rem !important;
+  border-color: rgb(var(--tx-border));
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.fi-input:focus,
+.fi-input-wrp:focus-within {
+  border-color: rgb(70 95 255);
+  box-shadow: 0 0 0 4px rgba(70, 95, 255, 0.12);
+}
+
+/* ===== Tables ===== */
+.fi-ta-header-cell {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: rgb(var(--tx-text-muted));
+}
+.fi-ta-row {
+  transition: background-color 0.15s ease;
+}
+.fi-ta-row:hover {
+  background-color: rgba(236, 243, 255, 0.4);
+}
+
+/* ===== Badges ===== */
+.fi-badge {
+  border-radius: 0.5rem !important;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* ===== Brand ===== */
+.fi-logo {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: rgb(var(--tx-text-heading)) !important;
+}
+
+/* ===== Modal ===== */
+.fi-modal-window {
+  border-radius: 1rem !important;
+  border: 1px solid rgb(var(--tx-border));
+}
+
+/* ===== Notifications (toasts) ===== */
+.fi-no-notification {
+  border-radius: 0.875rem !important;
+  border: 1px solid rgb(var(--tx-border));
+}
+
+/* ===== Selection ===== */
+::selection {
+  background: rgb(70 95 255);
+  color: white;
+}
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgb(208 213 221); border-radius: 6px; }
+.dark ::-webkit-scrollbar-thumb { background: rgb(52 64 84); }

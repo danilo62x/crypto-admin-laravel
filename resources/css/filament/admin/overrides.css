@@ -1,0 +1,233 @@
+/* ============================================================================
+ *  Tailwind Admin — overrides do tema Filament (CSS PURO, sem build Tailwind)
+ *
+ *  Por que CSS puro: o projeto usa Tailwind CSS 4 (@tailwindcss/vite), mas o
+ *  custom theme do Filament v3 é Tailwind 3 (@config + preset). Em vez de
+ *  manter um segundo build Tailwind 3 só pro painel, carregamos estes overrides
+ *  como asset CSS plano via FilamentAsset::register() (ver AppServiceProvider).
+ *  Eles só dependem das classes .fi-* do Filament + variáveis CSS — nada de
+ *  @apply/utilitários — então não precisam de compilação.
+ *
+ *  A identidade (fonte Outfit + cor primária indigo #465fff) vem do
+ *  AdminPanelProvider via ->font('Outfit') e ->colors(['primary' => ...]).
+ * ========================================================================== */
+
+/* As variáveis --tx-* e a fonte Outfit vêm do app.css (carregado no painel via
+ * render hook no AdminPanelProvider). Aqui só estilizamos as classes .fi-* do
+ * Filament consumindo essas mesmas variáveis (formato HEX → usar var() direto,
+ * não rgb(var())). Assim shell do Filament + conteúdo portado compartilham os
+ * mesmos tokens de design, sem colisão de formato. */
+
+html, body, .fi-body {
+  font-family: var(--font-sans, 'Outfit', ui-sans-serif, system-ui, sans-serif) !important;
+  letter-spacing: -0.01em;
+}
+
+/* ===== Body background ===== */
+.fi-body {
+  background-color: var(--tx-body-bg);
+  color: var(--tx-text);
+}
+
+/* ===== Sidebar ===== */
+.fi-sidebar {
+  background-color: var(--tx-sidebar-bg) !important;
+  border-right: 1px solid var(--tx-sidebar-border);
+}
+.fi-sidebar-nav-item-button {
+  border-radius: 0.625rem !important;
+  font-weight: 500;
+  color: var(--tx-sidebar-text) !important;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.fi-sidebar-nav-item-button:hover {
+  background-color: var(--tx-sidebar-active-bg) !important;
+  color: var(--tx-sidebar-text-active) !important;
+}
+.fi-sidebar-nav-item-active .fi-sidebar-nav-item-button,
+.fi-sidebar-nav-item-button[aria-current='page'] {
+  background-color: var(--tx-sidebar-active-bg) !important;
+  color: var(--tx-sidebar-text-active) !important;
+  font-weight: 600;
+}
+.fi-sidebar-group-label {
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  opacity: 0.6;
+}
+
+/* ===== Topbar ===== */
+.fi-topbar > nav {
+  background-color: var(--tx-header-bg) !important;
+  border-bottom: 1px solid var(--tx-border);
+  backdrop-filter: blur(12px);
+}
+
+/* ===== Page header ===== */
+.fi-header-heading {
+  font-size: 1.75rem !important;
+  font-weight: 600;
+  color: var(--tx-text-heading);
+  letter-spacing: -0.02em;
+}
+.fi-header-subheading {
+  color: var(--tx-text-muted);
+}
+
+/* ===== Cards / sections ===== */
+.fi-section,
+.fi-ta,
+.fi-wi-stats-overview-stat,
+.fi-fo-component-ctn {
+  border-radius: 0.875rem !important;
+  border-color: var(--tx-border) !important;
+  background-color: var(--tx-card-bg) !important;
+}
+
+/* ===== Buttons ===== */
+.fi-btn {
+  border-radius: 0.625rem !important;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  transition: transform 0.05s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+.fi-btn:active {
+  transform: translateY(1px);
+}
+.fi-btn-color-primary {
+  box-shadow: 0 4px 14px -4px rgba(70, 95, 255, 0.45);
+}
+
+/* ===== Form inputs ===== */
+.fi-input,
+.fi-select-input,
+.fi-fo-textarea,
+.fi-input-wrp {
+  border-radius: 0.625rem !important;
+  border-color: var(--tx-border);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.fi-input:focus,
+.fi-input-wrp:focus-within {
+  border-color: rgb(70 95 255);
+  box-shadow: 0 0 0 4px rgba(70, 95, 255, 0.12);
+}
+
+/* ===== Tables ===== */
+.fi-ta-header-cell {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: var(--tx-text-muted);
+}
+.fi-ta-row {
+  transition: background-color 0.15s ease;
+}
+.fi-ta-row:hover {
+  background-color: rgba(236, 243, 255, 0.4);
+}
+
+/* ===== Badges ===== */
+.fi-badge {
+  border-radius: 0.5rem !important;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* ===== Brand ===== */
+.fi-logo {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--tx-text-heading) !important;
+}
+
+/* ===== Modal ===== */
+.fi-modal-window {
+  border-radius: 1rem !important;
+  border: 1px solid var(--tx-border);
+}
+
+/* ===== Notifications (toasts) ===== */
+.fi-no-notification {
+  border-radius: 0.875rem !important;
+  border: 1px solid var(--tx-border);
+}
+
+/* ===== Selection ===== */
+::selection {
+  background: rgb(70 95 255);
+  color: white;
+}
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgb(208 213 221); border-radius: 6px; }
+.dark ::-webkit-scrollbar-thumb { background: rgb(52 64 84); }
+
+/* ===== Melhorias UI/UX Pro Max ===== */
+
+/* [§1/§7 reduced-motion] Respeita prefers-reduced-motion: neutraliza animações/
+   transições para quem pede menos movimento (acessibilidade). */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* [§6 number-tabular] Figuras tabulares em números de dados/preço para não
+   "dançar" entre linhas (tabelas, stats, paginação). Só afeta dígitos. */
+.fi-ta-cell, .fi-ta-text-item-label,
+.fi-wi-stats-overview-stat-value,
+.fi-pagination {
+  font-variant-numeric: tabular-nums;
+}
+
+/* [§1 focus-states] Garante anel de foco visível nos botões custom do header
+   (lang/dark/notificações) para navegação por teclado. */
+.fi-topbar [data-tx-action="toggle-dark"]:focus-visible,
+.fi-topbar [x-data] > button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(70, 95, 255, 0.4);
+}
+
+/* ===== Fix TW4 × Filament(TW3): classes de grid com custom property =====
+   O Filament v3 monta os grids de form/infolist/widget com classes do tipo
+   `grid-cols-[--cols-lg]` e `col-[--col-span-lg]`, que no Tailwind 3 significam
+   "use a CSS var" (→ grid-template-columns: var(--cols-lg)). No Tailwind 4 a forma
+   com colchetes vira VALOR LITERAL (→ grid-template-columns: --cols-lg), inválido.
+   Como o build TW4 deste projeto (app.css) regenera essas classes com a semântica
+   nova, ele sobrescreve o CSS correto do Filament e os grids quebram (campos
+   empilhados / em escada, seções espremidas). Aqui reescrevemos explicitamente as
+   classes para usar var() de novo, com !important, cobrindo todos os breakpoints.
+   Ordem default → sm → md → lg → xl → 2xl (maior vence por ordem de origem). */
+
+/* Container: número de colunas */
+.grid-cols-\[--cols-default\]      { grid-template-columns: var(--cols-default) !important; }
+@media (min-width: 640px)  { .sm\:grid-cols-\[--cols-sm\]   { grid-template-columns: var(--cols-sm) !important; } }
+@media (min-width: 768px)  { .md\:grid-cols-\[--cols-md\]   { grid-template-columns: var(--cols-md) !important; } }
+@media (min-width: 1024px) { .lg\:grid-cols-\[--cols-lg\]   { grid-template-columns: var(--cols-lg) !important; } }
+@media (min-width: 1280px) { .xl\:grid-cols-\[--cols-xl\]   { grid-template-columns: var(--cols-xl) !important; } }
+@media (min-width: 1536px) { .\32xl\:grid-cols-\[--cols-2xl\] { grid-template-columns: var(--cols-2xl) !important; } }
+
+/* Filhos: span de colunas */
+.col-\[--col-span-default\]      { grid-column: var(--col-span-default) !important; }
+@media (min-width: 640px)  { .sm\:col-\[--col-span-sm\]   { grid-column: var(--col-span-sm) !important; } }
+@media (min-width: 768px)  { .md\:col-\[--col-span-md\]   { grid-column: var(--col-span-md) !important; } }
+@media (min-width: 1024px) { .lg\:col-\[--col-span-lg\]   { grid-column: var(--col-span-lg) !important; } }
+@media (min-width: 1280px) { .xl\:col-\[--col-span-xl\]   { grid-column: var(--col-span-xl) !important; } }
+@media (min-width: 1536px) { .\32xl\:col-\[--col-span-2xl\] { grid-column: var(--col-span-2xl) !important; } }
+
+/* Filhos: início de coluna (col-start) */
+.col-start-\[--col-start-default\]      { grid-column-start: var(--col-start-default) !important; }
+@media (min-width: 640px)  { .sm\:col-start-\[--col-start-sm\]   { grid-column-start: var(--col-start-sm) !important; } }
+@media (min-width: 768px)  { .md\:col-start-\[--col-start-md\]   { grid-column-start: var(--col-start-md) !important; } }
+@media (min-width: 1024px) { .lg\:col-start-\[--col-start-lg\]   { grid-column-start: var(--col-start-lg) !important; } }
+@media (min-width: 1280px) { .xl\:col-start-\[--col-start-xl\]   { grid-column-start: var(--col-start-xl) !important; } }
+@media (min-width: 1536px) { .\32xl\:col-start-\[--col-start-2xl\] { grid-column-start: var(--col-start-2xl) !important; } }

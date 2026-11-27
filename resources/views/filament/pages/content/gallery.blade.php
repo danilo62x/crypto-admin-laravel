@@ -1,0 +1,168 @@
+<x-filament-panels::page>
+    {{-- conteúdo portado de resources/views/pages/gallery.blade.php --}}
+    <div class="space-y-6">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 class="text-title-sm font-bold text-heading">Galeria</h1>
+          <p class="mt-1 text-sm text-muted">Imagens e vídeos da sua biblioteca de mídia.</p>
+        </div>
+        <div id="tabs" class="inline-flex rounded-lg border border-themed p-0.5"></div>
+      </div>
+
+      <div id="gallery-grid" class="grid auto-rows-[180px] grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4"></div>
+
+      <div id="empty" class="surface-card rounded-2xl border p-12 text-center text-sm text-muted shadow-theme-sm hidden">
+        Nenhuma mídia nesta categoria.
+      </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="fixed inset-0 z-[80] items-center justify-center bg-gray-900/80 p-4 backdrop-blur-sm hidden">
+      <button id="lb-close" class="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20" aria-label="Fechar"></button>
+      <button id="lb-prev" class="absolute left-4 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20" aria-label="Anterior"></button>
+
+      <div class="w-full max-w-3xl">
+        <div id="lb-media" class="aspect-video w-full overflow-hidden rounded-2xl shadow-theme-xl"></div>
+        <div class="mt-4 flex items-center justify-between">
+          <div>
+            <p id="lb-title" class="text-base font-semibold text-white"></p>
+            <p id="lb-meta" class="text-sm text-white/60"></p>
+          </div>
+          <span id="lb-count" class="text-sm text-white/60"></span>
+        </div>
+      </div>
+
+      <button id="lb-next" class="absolute right-4 bottom-4 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 sm:bottom-auto" aria-label="Próximo"></button>
+    </div>
+
+@push('scripts')
+@verbatim
+  <script>
+    // Mídia 100% livre de direitos autorais:
+    //  • Imagens: Lorem Picsum (picsum.photos) — domínio público, sem atribuição.
+    //  • Vídeos: open movies da Blender Foundation (Big Buck Bunny, CC-BY) e MDN (flower, CC0).
+    const pic = (seed, w = 800, h = 600) => `https://picsum.photos/seed/${seed}/${w}/${h}`;
+    const VID_BBB720 = 'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_2MB.mp4';
+    const VID_BBB360 = 'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4';
+    const VID_FLOWER = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+    const VID_BBB_W3 = 'https://www.w3schools.com/html/mov_bbb.mp4';
+
+    const MEDIA = [
+      { id: '1', title: 'Pôr do sol na praia', type: 'image', meta: '1920 × 1080', thumb: pic('praia', 800, 1100), span: true },
+      { id: '2', title: 'Montanhas ao amanhecer', type: 'image', meta: '2400 × 1600', thumb: pic('montanha'), span: false },
+      { id: '3', title: 'Tour pelo escritório', type: 'video', meta: '00:10 · MP4', thumb: pic('escritorio'), video: VID_BBB720, span: false },
+      { id: '4', title: 'Arquitetura moderna', type: 'image', meta: '1600 × 2000', thumb: pic('arquitetura', 800, 1100), span: true },
+      { id: '5', title: 'Lançamento do produto', type: 'video', meta: '00:06 · MP4', thumb: pic('produto'), video: VID_FLOWER, span: false },
+      { id: '6', title: 'Floresta tropical', type: 'image', meta: '2048 × 1365', thumb: pic('floresta'), span: false },
+      { id: '7', title: 'Cidade à noite', type: 'image', meta: '1920 × 1280', thumb: pic('cidade'), span: false },
+      { id: '8', title: 'Depoimento de cliente', type: 'video', meta: '00:10 · MP4', thumb: pic('depoimento', 800, 1100), video: VID_BBB_W3, span: true },
+      { id: '9', title: 'Detalhe de textura', type: 'image', meta: '1500 × 1500', thumb: pic('textura'), span: false },
+      { id: '10', title: 'Equipe em reunião', type: 'image', meta: '2200 × 1400', thumb: pic('equipe'), span: false },
+      { id: '11', title: 'Bastidores do evento', type: 'video', meta: '00:10 · MP4', thumb: pic('evento'), video: VID_BBB360, span: false },
+      { id: '12', title: 'Paisagem minimalista', type: 'image', meta: '1920 × 1080', thumb: pic('paisagem', 800, 1100), span: true },
+    ];
+
+    const TABS = [
+      { id: 'all', label: 'Todos' },
+      { id: 'image', label: 'Imagens' },
+      { id: 'video', label: 'Vídeos' },
+    ];
+
+    let tab = 'all';
+    let lightboxIndex = null;
+
+    function esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+    function filtered() { return MEDIA.filter((m) => tab === 'all' || m.type === tab); }
+
+    const $grid = document.getElementById('gallery-grid');
+    const $tabs = document.getElementById('tabs');
+    const $empty = document.getElementById('empty');
+
+    // Static lightbox chrome icons
+    document.getElementById('lb-close').innerHTML = icon('x', { size: 22 });
+    document.getElementById('lb-prev').innerHTML = icon('chevron-right', { size: 24, className: 'rotate-180' });
+    document.getElementById('lb-next').innerHTML = icon('chevron-right', { size: 24 });
+
+    function renderTabs() {
+      $tabs.innerHTML = TABS.map((t) => `
+        <button data-tab="${t.id}" class="rounded-md px-4 py-1.5 text-sm font-medium transition ${tab === t.id ? 'bg-brand-500 text-white' : 'text-muted hover:bg-gray-50 dark:hover:bg-gray-800'}">${t.label}</button>`).join('');
+    }
+
+    function renderGrid() {
+      const list = filtered();
+      $grid.innerHTML = list.map((m, idx) => `
+        <button data-open="${idx}" class="group relative overflow-hidden rounded-2xl border border-themed text-left shadow-theme-sm ${m.span ? 'row-span-2' : ''}">
+          <div class="h-full w-full bg-cover bg-center transition-transform duration-300 group-hover:scale-105" style="background-color:#1f2937;background-image:url('${m.thumb}')"></div>
+          ${m.type === 'video' ? `<span class="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-gray-900/60 px-2 py-0.5 text-xs font-medium text-white backdrop-blur-sm">${icon('eye', { size: 12 })} Vídeo</span>` : ''}
+          <div class="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-gray-900/70 via-transparent to-transparent p-4 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+            <p class="text-sm font-semibold text-white">${esc(m.title)}</p>
+            <p class="text-xs text-white/70">${esc(m.meta)}</p>
+          </div>
+          <span class="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-gray-700 opacity-0 transition-opacity duration-200 group-hover:opacity-100 dark:bg-gray-900/80 dark:text-gray-100">${icon('grid', { size: 16 })}</span>
+        </button>`).join('');
+      $empty.classList.toggle('hidden', list.length !== 0);
+    }
+
+    // Lightbox
+    const $lb = document.getElementById('lightbox');
+    function renderLightbox() {
+      const list = filtered();
+      const active = lightboxIndex !== null ? list[lightboxIndex] : null;
+      if (!active) {
+        $lb.classList.add('hidden');
+        $lb.classList.remove('flex');
+        document.body.style.overflow = '';
+        return;
+      }
+      $lb.classList.remove('hidden');
+      $lb.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+      const $media = document.getElementById('lb-media');
+      $media.style.background = '#0c111d';
+      $media.innerHTML = active.type === 'video'
+        ? `<video class="h-full w-full object-contain" src="${active.video}" poster="${active.thumb}" controls autoplay playsinline></video>`
+        : `<img class="h-full w-full object-cover" src="${active.thumb}" alt="${esc(active.title)}" />`;
+      document.getElementById('lb-title').textContent = active.title;
+      document.getElementById('lb-meta').textContent = `${active.type === 'video' ? 'Vídeo' : 'Imagem'} · ${active.meta}`;
+      document.getElementById('lb-count').textContent = `${lightboxIndex + 1} / ${list.length}`;
+    }
+
+    function closeLb() { lightboxIndex = null; renderLightbox(); }
+    function prevLb() { const n = filtered().length; if (lightboxIndex === null) return; lightboxIndex = (lightboxIndex - 1 + n) % n; renderLightbox(); }
+    function nextLb() { const n = filtered().length; if (lightboxIndex === null) return; lightboxIndex = (lightboxIndex + 1) % n; renderLightbox(); }
+
+    $tabs.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-tab]');
+      if (!btn) return;
+      tab = btn.getAttribute('data-tab');
+      lightboxIndex = null;
+      renderTabs();
+      renderGrid();
+      renderLightbox();
+    });
+
+    $grid.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-open]');
+      if (!btn) return;
+      lightboxIndex = +btn.getAttribute('data-open');
+      renderLightbox();
+    });
+
+    document.getElementById('lb-close').addEventListener('click', closeLb);
+    document.getElementById('lb-prev').addEventListener('click', prevLb);
+    document.getElementById('lb-next').addEventListener('click', nextLb);
+    $lb.addEventListener('click', (e) => { if (e.target === $lb) closeLb(); });
+    document.addEventListener('keydown', (e) => {
+      if (lightboxIndex === null) return;
+      if (e.key === 'Escape') closeLb();
+      else if (e.key === 'ArrowLeft') prevLb();
+      else if (e.key === 'ArrowRight') nextLb();
+    });
+
+    renderTabs();
+    renderGrid();
+  </script>
+@endverbatim
+@endpush
+</x-filament-panels::page>
